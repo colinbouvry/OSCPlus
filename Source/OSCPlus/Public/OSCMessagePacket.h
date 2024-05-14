@@ -1,11 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 #pragma once
 
+#if WITH_EDITOR
+
 #include "OSCAddress.h"
 #include "OSCPacket.h"
+#include "OSCStream.h"
 
 class FOSCType;
-
 
 class FOSCMessagePacket : public IOSCPacket
 {
@@ -41,3 +43,5 @@ private:
 	/** List of argument types. */
 	TArray<FOSCType> Arguments;
 };
+	
+#endif

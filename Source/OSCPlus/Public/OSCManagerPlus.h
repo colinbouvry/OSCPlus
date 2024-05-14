@@ -19,9 +19,12 @@ class OSCPLUS_API UOSCManagerPlus : public UOSCManager
 	static UPARAM(DisplayName = "Succeeded") bool GetDouble(const FOSCMessage& Message, const int32 Index, double& Value);
 
 	/** Adds double value to end of OSCMessage */
-	UFUNCTION(BlueprintCallable, Category = "Audio|OSC", meta = (DisplayName = "Add Float to OSC Message", Keywords = "osc message"))
+	UFUNCTION(BlueprintCallable, Category = "Audio|OSC", meta = (DisplayName = "Add Double to OSC Message", Keywords = "osc message"))
 	static UPARAM(DisplayName = "Message") FOSCMessage& AddDouble(UPARAM(ref) FOSCMessage& Message, double Value);
 
 	UFUNCTION(BlueprintCallable, Category = "Audio|OSC", meta = (DisplayName = "Create OSCMessage from Bytes", Keywords = "osc message"))
-	static FOSCMessage& CreateOSCMessageFromBytes(const TArray<uint8>& ByteData);
+	static FOSCMessage CreateOSCMessageFromBytes(const TArray<uint8>& ByteData);
+
+	UFUNCTION(BlueprintCallable, Category = "Audio|OSC", meta = (DisplayName = "Create Bytes from OSCMessage", Keywords = "osc message"))
+	static TArray<uint8> CreateBytesFromOSCMessage(const FOSCMessage& Message);
 };

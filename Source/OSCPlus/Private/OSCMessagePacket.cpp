@@ -1,10 +1,11 @@
+
+#if WITH_EDITOR
+
 // Copyright Epic Games, Inc. All Rights Reserved.
 #include "OSCMessagePacket.h"
 
 #include "OSCLog.h"
-#include "OSCStream.h"
 #include "OSCTypes.h"
-
 
 FOSCMessagePacket::FOSCMessagePacket()
 	: IOSCPacket()
@@ -182,3 +183,4 @@ void FOSCMessagePacket::ReadData(FOSCStream& Stream)
 		}
 	}
 }
+#endif	

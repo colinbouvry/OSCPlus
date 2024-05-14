@@ -2,13 +2,17 @@
 
 #include "OSCManagerPlus.h"
 #include "OSCMessage.h"
-#include "OSCLog.h"
+#include "OSCPlusLog.h"
 #include "OSCMessagePacket.h"
 
-DEFINE_LOG_CATEGORY(LogOSC);
-#define OSC_LOG_INVALID_TYPE_AT_INDEX(TypeStr, Index, Msg) UE_LOG(LogOSC, Warning, TEXT("OSC Message Parse Failed: OSCType not %s: index '%i', OSCAddress '%s'"), TypeStr, Index, *Msg.GetAddress().GetFullPath())
+#if WITH_EDITOR
+	DEFINE_LOG_CATEGORY(LogOSC);
+#endif
 
-namespace OSC
+DEFINE_LOG_CATEGORY(LogOSCPlus);
+#define OSC_LOG_INVALID_TYPE_AT_INDEX(TypeStr, Index, Msg) UE_LOG(LogOSCPlus, Warning, TEXT("OSC Message Parse Failed: OSCType not %s: index '%i', OSCAddress '%s'"), TypeStr, Index, *Msg.GetAddress().GetFullPath())
+
+namespace OSCPlus
 {
 	const FOSCType* GetOSCTypeAtIndex(const FOSCMessage& InMessage, const int32 InIndex)
 	{
@@ -32,7 +36,7 @@ namespace OSC
 bool UOSCManagerPlus::GetDouble(const FOSCMessage& InMessage, const int32 InIndex, double& OutValue)
 {
 	OutValue = 0;
-	if (const FOSCType* OSCType = OSC::GetOSCTypeAtIndex(InMessage, InIndex))
+	if (const FOSCType* OSCType = OSCPlus::GetOSCTypeAtIndex(InMessage, InIndex))
 	{
 		if (OSCType->IsDouble())
 		{
@@ -52,11 +56,30 @@ FOSCMessage& UOSCManagerPlus::AddDouble(FOSCMessage& OutMessage, double InValue)
 	return OutMessage;
 }
 
-FOSCMessage& UOSCManagerPlus::CreateOSCMessageFromBytes(const TArray<uint8>& ByteData)
+FOSCMessage UOSCManagerPlus::CreateOSCMessageFromBytes(const TArray<uint8>& ByteData)
 {
 	FOSCStream Stream(ByteData.GetData(), ByteData.GetAllocatedSize());
 	TSharedPtr<FOSCMessagePacket> MessagePacket = MakeShared<FOSCMessagePacket>();
 	MessagePacket->ReadData(Stream);
-	static FOSCMessage Message(MessagePacket);
+	FOSCMessage Message(MessagePacket);
 	return Message;
+}
+
+TArray<uint8> UOSCManagerPlus::CreateBytesFromOSCMessage(const FOSCMessage& Message)
+{
+	// Create an OSC stream
+	FOSCStream Stream;
+
+	// Get the OSC message packet from the message
+	const TSharedPtr<FOSCMessagePacket>& MessagePacket = StaticCastSharedPtr<FOSCMessagePacket>(Message.GetPacket());
+
+	// Write the message data into the stream
+	MessagePacket->WriteData(Stream);
+
+	// Create a byte array and copy the data from the stream into it
+	TArray<uint8> ByteData;
+	ByteData.SetNumUninitialized(Stream.GetLength());
+	FMemory::Memcpy(ByteData.GetData(), Stream.GetData(), Stream.GetLength());
+
+	return ByteData;
 }
